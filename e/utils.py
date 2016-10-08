@@ -4,7 +4,6 @@ import cPickle
 import codecs
 import json
 import os
-import re
 from collections import defaultdict, Counter
 
 import spacy
@@ -12,10 +11,6 @@ from nltk import word_tokenize
 
 from settings import *
 
-re_filter = re.compile('[^a-zA-Z0-9]')
-re_filter2 = re.compile('\s+')
-QUESTION_LENGTH = 25
-MAX_ANSWER = 2000
 spacy_t = None
 
 
