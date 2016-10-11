@@ -45,6 +45,9 @@ def tokenize(sentence,
 
 
 class Count:
+    """
+    minimum implement of collections.Counter using defaultdict but higher performance
+    """
     def __init__(self, default_func=None):
         if default_func:
             self.d = defaultdict(default_func)
