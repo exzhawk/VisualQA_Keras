@@ -48,6 +48,7 @@ class Count:
     """
     minimum implement of collections.Counter using defaultdict but higher performance
     """
+
     def __init__(self, default_func=None):
         if default_func:
             self.d = defaultdict(default_func)
@@ -172,14 +173,18 @@ def gen_data(m='train'):
                 continue
             # answer_str = random.choice(possible_answers)
             # answer_str = possible_answers[0]
-            answer_str = Counter(possible_answers).most_common()[0][0]
-            answer_id = answers_mapping[answer_str]
+            # answer_str = Counter(possible_answers).most_common()[0][0]
+            for answer_str in possible_answers:
+                answer_id = answers_mapping[answer_str]
+                questions_list.append(question_word_id_list)
+                images_list.append(image_feature)
+                answers_list.append(answer_id)
         else:
             answer_id = [answers_mapping[answer_str] for answer_str in possible_answers]
+            questions_list.append(question_word_id_list)
+            images_list.append(image_feature)
+            answers_list.append(answer_id)
 
-        questions_list.append(question_word_id_list)
-        images_list.append(image_feature)
-        answers_list.append(answer_id)
     cPickle.dump((images_list, questions_list, answers_list),
                  open(data_path('{}_matrix.pkl'.format(m)), 'wb'), protocol=cPickle.HIGHEST_PROTOCOL)
 
@@ -191,10 +196,10 @@ def get_possible_answers(answers, known_answers):
     :param known_answers:
     :return:
     """
-    known_possible_answers = []
+    known_possible_answers = set()
     for answer in answers:
         if answer['answer_confidence'] == 'yes' and answer['answer'] in known_answers:
-            known_possible_answers.append(answer['answer'])
+            known_possible_answers.add(answer['answer'])
     return known_possible_answers
     # return random.choice(known_possible_answers)
 
@@ -210,6 +215,35 @@ def utf8decode_test(filename='../data/wiki.en.model.vec'):
     pass
 
 
+def answer_compare():
+    answer_j = json.load(open(data_path('f_mscoco_train2014_annotations.json')))
+    answers_mapping = json.load(open(data_path('f_answers_id_map.json'), 'r'))
+    one_answer_count = 0
+    for annotation in answer_j['annotations']:
+        for answer in annotation['answers']:
+            if answer['answer'] in answers_mapping:
+                one_answer_count += 1
+                break
+    all_answer_count = 0
+    for annotation in answer_j['annotations']:
+        for answer in annotation['answers']:
+            if answer['answer'] in answers_mapping:
+                all_answer_count += 1
+    no_dupe_all_answer_count = 0
+    for annotation in answer_j['annotations']:
+        seen_answer = set()
+        for answer in annotation['answers']:
+            if answer == 'yes':
+                pass
+            if answer['answer'] not in seen_answer:
+                seen_answer.add(answer['answer'])
+                if answer['answer'] in answers_mapping:
+                    no_dupe_all_answer_count += 1
+    print(one_answer_count, all_answer_count, no_dupe_all_answer_count)
+
+
 if __name__ == '__main__':
     # utf8decode_test()
+    answer_compare()
+
     pass

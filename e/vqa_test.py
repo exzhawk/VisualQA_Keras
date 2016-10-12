@@ -21,7 +21,7 @@ def VQA():
     question_input = Input(shape=(QUESTION_LENGTH,), name='input_question')
     x_str = Embedding(word_vec_len, 300, input_length=QUESTION_LENGTH, mask_zero=True, weights=[word_vec_list])(
         question_input)
-    x_str = LSTM(1024, dropout_W=0.5)(x_str)
+    x_str = LSTM(2048, dropout_W=0.5, consume_less='gpu')(x_str)
     x_str = Dense(1024, activation='tanh', name='fc4')(x_str)
     x_f = merge([x_img, x_str], mode='mul', name='merge1')
     x_f = Dense(MAX_ANSWER, activation='tanh', name='fc5')(x_f)
@@ -35,7 +35,7 @@ def VQA():
 
 
 if __name__ == '__main__':
-    prepare_all()
+    # prepare_all()
     batch_size = 500
     epoch = 1
     train_images, train_questions, train_answers = get_matrix('train')
@@ -44,6 +44,7 @@ if __name__ == '__main__':
     rmsprop = RMSprop(lr=3e-4)
     m.compile(loss='categorical_crossentropy', optimizer=rmsprop, metrics=['accuracy'])
     for i in range(100):
+        print(i)
         m.fit([train_images, train_questions], train_answers, batch_size=batch_size, nb_epoch=epoch)
         # m.save('vqa.h5')
         # m = load_model('vqa.h5')
